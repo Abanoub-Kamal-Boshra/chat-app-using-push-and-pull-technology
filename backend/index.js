@@ -12,22 +12,27 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
 
-  io.emit('group chat clients', socket.id);
+  console.log('user connected ', socket.id);
+  socket.broadcast.emit('group chat clients', socket.id);
 
   socket.on('connect specific client', (socketId, mySocketId) => {
-    io.to(socketId).emit(mySocketId);
-    // console.log('call with: ', socketId);
+    io.to(socketId).emit('connect specific client',mySocketId);
   });
 
-  socket.on('chat specific client', (socketId, msg) => {
-    io.to(socketId).emit(msg);
-    // console.log('call with: ', socketId);
+  socket.on('chat specific client', (socketId, mySocketId, msg) => {
+    io.to(socketId).emit('chat specific client message',msg);
+    io.to(mySocketId).emit('chat specific client message',msg);
   });
 
   socket.on('server group chat message', (msg) => {
     io.emit('group chat message', msg);
   });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected', socket.id);
+  });
 });
+
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
