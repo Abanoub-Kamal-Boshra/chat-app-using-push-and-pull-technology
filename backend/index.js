@@ -10,11 +10,23 @@ const io = new Server(server, {
   } 
 });
 
+let flag = 0;
+let clientIds = [];
+
 io.on('connection', (socket) => {
 
-  console.log('user connected ', socket.id);
-  socket.broadcast.emit('group chat clients', socket.id);
+  //solve douple connecting for same user with two socket ids                                                                                     
+  if(flag%2 ==0){
+    socket.broadcast.emit('group chat clients', socket.id);
+    clientIds.push(socket.id);
+  }
+  flag++;
+  if(flag == 1001){
+    flag = 0;
+  }
+  io.to(socket.id).emit('init clients list',clientIds);
 
+  // handle another requests
   socket.on('connect specific client', (socketId, mySocketId) => {
     io.to(socketId).emit('connect specific client',mySocketId);
   });
@@ -29,7 +41,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected', socket.id);
+    clientIds = clientIds.filter(client => client !== socket.id);
+    io.emit('init clients list',clientIds);
   });
 });
 

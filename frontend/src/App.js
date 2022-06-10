@@ -5,8 +5,11 @@ import WSgroupChat from './ws-task1';
 function App() {
   return (
     <div className="App">
+      {/* Task 1 */}
       {/* <WSgroupChat/> */}
-      <WS/>
+      
+      {/* Task 2 */}
+      <WS />
     </div>
   );
 }
